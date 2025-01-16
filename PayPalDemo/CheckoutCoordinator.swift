@@ -9,7 +9,7 @@ class CheckoutCoordinator: ObservableObject {
     func startCardCheckout(amount: Double) {
         DispatchQueue.main.async {
             self.cardPaymentViewModel = CardPaymentViewModel()
-            self.navigationPath.append(.checkout(amount: amount))
+            self.navigationPath.append(.cardCheckout(amount: amount))
         }
     }
     

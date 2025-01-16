@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct CartView: View {
-    @State private var totalAmount: Double = 29.99
-    var onPayWithPayPal: () -> Void
-    var onPayWithCard: (Double) -> Void
+    @EnvironmentObject var coordinator: CheckoutCoordinator
+    
+    let items: [Item] = [
+        Item(name: "White T-Shirt", imageName: "tshirt", amount: 29.99)
+    ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 30) {
@@ -11,7 +13,11 @@ struct CartView: View {
                 .font(.largeTitle)
                 .padding([.top, .leading])
             
-            CartItemView(amount: totalAmount)
+            ForEach(items) { item in
+                VStack {
+                    CartItemView(item: item)
+                }
+            }
 
             Divider()
                 .padding(.vertical)
@@ -26,7 +32,7 @@ struct CartView: View {
                     title: "Pay with PayPal",
                     imageName: "paypal_color_monogram@3x",
                     backgroundColor: Color.yellow,
-                    action: onPayWithPayPal
+                    action: coordinator.startPayPalCheckout
                 )
                 
                 PaymentButton(
@@ -34,7 +40,7 @@ struct CartView: View {
                     imageName: nil,
                     backgroundColor: Color.black,
                     action: {
-                        onPayWithCard(totalAmount)
+                        coordinator.startCardCheckout(amount: totalAmount)
                     }
                 )
             }
@@ -44,16 +50,20 @@ struct CartView: View {
         .background(Color(.systemBackground))
         .edgesIgnoringSafeArea(.bottom)
     }
+    
+    private var totalAmount: Double {
+        items.reduce(0, { $0 + $1.amount})
+    }
 }
 
 
 struct CartItemView: View {
-    let amount: Double
+    let item: Item
 
     var body: some View {
         VStack(alignment: .leading, spacing: 15){
             HStack{
-                Image(systemName: "tshirt")
+                Image(systemName: item.imageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 50, height: 50)
@@ -61,13 +71,13 @@ struct CartItemView: View {
                     .cornerRadius(8)
                 
                 VStack(alignment: .leading) {
-                    Text("White T-Shirt")
+                    Text(item.name)
                         .font(.headline)
                 }
                 
                 Spacer()
                 
-                Text("$\(amount, specifier: "%.2f")")
+                Text("$\(item.amount, specifier: "%.2f")")
                     .font(.headline)
             }
             .padding()
