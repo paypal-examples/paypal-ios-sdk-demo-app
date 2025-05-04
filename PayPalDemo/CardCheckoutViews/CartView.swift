@@ -7,7 +7,7 @@ struct CartView: View {
     var onPayWithCard: (Double) -> Void
 
     let items: [Item] = [
-        Item(name: "White T-Shirt", imageName: "tshirt", amount: 29.99)
+        Item(name: "10 Credit Points", imageName: "gold", amount: 19.99)
         ]
     private var totalAmount: Double {
         items.reduce(0, { $0 + $1.amount})
@@ -34,21 +34,15 @@ struct CartView: View {
             Spacer()
             
             VStack(spacing: 10) {
-                PayPalButton.Representable(
-                    size: .expanded,
-                    label: .payWith
-                ){
-                    onPayWithPayPal(totalAmount)
-                }
-                .fixedSize(horizontal: false, vertical: true)
                 PaymentButton(
-                    title: "Pay with Card",
+                    title: "Pay Now",
                     imageName: nil,
-                    backgroundColor: Color.black,
+                    backgroundColor: Color(hex: "FFC439")!,
                     action: {
-                        onPayWithCard(totalAmount)
+                        guard let url = URL(string: "https://www.sandbox.paypal.com/ncp/payment/BFXRZ54VKCAQ6") else { return }
+                        UIApplication.shared.open(url)
                     }
-                )
+                    )
             }
             .padding(.horizontal)
             .padding(.bottom, 40)
@@ -64,11 +58,11 @@ struct CartItemView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 15){
-            HStack{
-                Image(systemName: item.imageName)
+            HStack(alignment: .center) {
+                Image(item.imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 50, height: 50)
+                    .frame(width: 100, height: 100)
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                 
@@ -133,9 +127,39 @@ struct PaymentButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .foregroundColor(.white)
+            .foregroundColor(.black)
             .background(backgroundColor)
             .cornerRadius(4)
         }
+    }
+}
+
+extension Color {
+    init?(hex: String) {
+        var hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hex = hex.replacingOccurrences(of: "#", with: "")
+
+        guard let int = UInt64(hex, radix: 16) else { return nil }
+
+        let r, g, b, a: Double
+
+        switch hex.count {
+        case 6: // RGB
+            r = Double((int >> 16) & 0xFF) / 255
+            g = Double((int >> 8) & 0xFF) / 255
+            b = Double(int & 0xFF) / 255
+            a = 1.0
+
+        case 8: // RGBA
+            r = Double((int >> 24) & 0xFF) / 255
+            g = Double((int >> 16) & 0xFF) / 255
+            b = Double((int >> 8) & 0xFF) / 255
+            a = Double(int & 0xFF) / 255
+
+        default:
+            return nil
+        }
+
+        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
     }
 }
