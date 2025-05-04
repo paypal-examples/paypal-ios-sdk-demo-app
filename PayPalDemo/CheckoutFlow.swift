@@ -7,6 +7,7 @@ enum CheckoutStep: Hashable {
 
 struct CheckoutFlow: View {
     @StateObject private var coordinator = CheckoutCoordinator()
+    @EnvironmentObject private var redirectHandler: RedirectHandler
 
     var body: some View {
         NavigationStack(path: $coordinator.navigationPath) {
@@ -38,6 +39,11 @@ struct CheckoutFlow: View {
                 }
             }
         }
+        .onChange(of: redirectHandler.orderCompleted) { isCompleted in
+            if isCompleted {
+                coordinator.navigationPath.append(.complete(orderID: redirectHandler.amount))
+            }
+        }
         .overlay {
             if coordinator.isLoading {
                 ProgressView("Processing...")
@@ -55,8 +61,4 @@ struct CheckoutFlow: View {
             )
         }
     }
-}
-
-#Preview {
-    CheckoutFlow()
 }
