@@ -75,13 +75,27 @@ class AppSwitchHandler: NSObject {
     /// Doc: Step 3 -- iOS 17.4+ uses .https callback (no custom URL scheme needed).
     ///               Earlier iOS uses custom URL scheme.
     private func openBrowserFallback(url: URL) {
-        // iOS 17.4+ supports HTTPS-based callback scheme
+        // Detect simulator — .https callback requires Associated Domains which
+        // aren't available on simulators. Always use custom URL scheme on simulator.
+        #if targetEnvironment(simulator)
+        let useCustomScheme = true
+        #else
+        let useCustomScheme = false
+        #endif
+
+        // iOS 17.4+ supports HTTPS-based callback scheme (real devices only)
         // Doc: "iOS 17.4+ supports HTTPS-based ASWebAuthenticationSession callbacks
         //       (no custom URL scheme needed)"
-        if #available(iOS 17.4, *) {
+        if #available(iOS 17.4, *), !useCustomScheme {
+            // Production path: use HTTPS callback with your verified domain.
+            // Replace "example.com" with the domain from your Config.plist RETURN_DOMAIN.
+            let returnDomain = Bundle.main.object(forInfoDictionaryKey: "RETURN_DOMAIN") as? String
+                ?? (try? NSDictionary(contentsOf: Bundle.main.url(forResource: "Config", withExtension: "plist")!))?["RETURN_DOMAIN"] as? String
+                ?? "example.com"
+
             let session = ASWebAuthenticationSession(
                 url: url,
-                callback: .https(host: "example.com", path: "/paypal/return")
+                callback: .https(returnDomain, path: "/paypal/return")
             ) { [weak self] callbackURL, error in
                 if let callbackURL = callbackURL {
                     self?.handleReturn(url: callbackURL)
@@ -94,7 +108,8 @@ class AppSwitchHandler: NSObject {
             session.start()
             authSession = session
         } else {
-            // Older iOS -- use custom URL scheme callback
+            // Simulator or older iOS -- use custom URL scheme callback.
+            // This always works without domain verification.
             // Doc: "Earlier versions require a registered custom URL scheme for the browser fallback."
             let session = ASWebAuthenticationSession(
                 url: url,

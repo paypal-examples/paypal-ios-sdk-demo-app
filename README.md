@@ -17,7 +17,7 @@ Sample apps demonstrating PayPal payment integrations for iOS and Android. Clone
 
 | | Direct API (App Switch) | Native SDK |
 |---|---|---|
-| **SDK dependency** | None — raw URLSession / HttpURLConnection | PayPal iOS SDK / Android SDK |
+| **SDK dependency** | None — raw URLSession | PayPal iOS SDK |
 | **UI ownership** | You build the UI | SDK provides checkout sheet |
 | **Server calls** | Your app calls your server, server calls PayPal | SDK handles most communication |
 | **App Switch** | Full control over redirect and return handling | Managed by SDK |
@@ -46,21 +46,16 @@ Or use Docker:
 docker-compose up
 ```
 
-### 3. Run the mobile app
+### 3. Run the iOS app
 
-**iOS:**
 ```bash
-cd direct-api-app-switch/ios
-cp Config.plist.example Config.plist   # paste credentials
-# Open AppSwitchTest.xcodeproj in Xcode, run on device
+cd direct-api-app-switch
+cp Config.plist.example AppSwitchTest/AppSwitchTest/Config.plist   # paste credentials
+open AppSwitchTest/AppSwitchTest.xcodeproj
+# Select iPhone simulator or device, press Cmd+R
 ```
 
-**Android:**
-```bash
-cd direct-api-app-switch/android
-cp local.properties.example local.properties   # paste credentials
-# Open in Android Studio, run on device
-```
+> **Simulator note:** The app works on simulators — it uses a custom URL scheme fallback for the browser auth flow. On real devices with a verified domain, it uses the HTTPS callback path.
 
 ### 4. Test a payment
 
@@ -82,13 +77,9 @@ Check `http://localhost:3000/debug` to see every API request and response as cop
 ├── LICENSE                      ← Apache 2.0
 ├── docker-compose.yml           ← One-command server startup
 ├── demo-server/                 ← Node.js server (OAuth, Orders, Vault)
-├── direct-api-app-switch/       ← Direct API with app_switch_context
-│   ├── ios/                     ← Swift sample app
-│   └── android/                 ← Kotlin sample app
-├── native-sdk/                  ← PayPal Mobile SDK integration
-│   ├── ios/
-│   └── android/
-└── e2e/demos/                   ← Playwright demo recording scripts
+├── direct-api-app-switch/       ← Direct API with app_switch_context (Swift)
+├── native-sdk/                  ← PayPal Mobile SDK integration (Swift)
+└── demo-server/                 ← Node.js server (OAuth, Orders, Vault)
 ```
 
 ---
