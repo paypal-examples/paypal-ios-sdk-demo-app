@@ -1,0 +1,33 @@
+{
+  "name": "PayPal App Switch Demo Server",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "features": {},
+  "postCreateCommand": "cd demo-server && npm install",
+  "postStartCommand": "cd demo-server && echo \"PAYPAL_CLIENT_ID=$PAYPAL_CLIENT_ID\nPAYPAL_CLIENT_SECRET=$PAYPAL_CLIENT_SECRET\nPAYPAL_API_BASE=https://api-m.sandbox.paypal.com\nRETURN_DOMAIN=https://example.com\nPORT=3000\" > .env && npm start",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Demo Server",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "secrets": {
+    "PAYPAL_CLIENT_ID": {
+      "description": "PayPal sandbox Client ID. Get one at https://developer.paypal.com/dashboard/applications/sandbox"
+    },
+    "PAYPAL_CLIENT_SECRET": {
+      "description": "PayPal sandbox Client Secret from the same dashboard page."
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  }
+}

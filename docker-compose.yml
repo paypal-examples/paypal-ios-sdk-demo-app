@@ -1,0 +1,7 @@
+services:
+  demo-server:
+    build: ./demo-server
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./demo-server/.env

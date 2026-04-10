@@ -1,0 +1,55 @@
+name: Weekly Health Check
+
+on:
+  schedule:
+    - cron: '23 15 * * 1'  # Monday 3:23pm UTC (avoid :00/:30)
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  server-health:
+    name: "Demo Server: Sandbox connectivity"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: demo-server/.nvmrc
+      - name: Install dependencies
+        run: cd demo-server && npm install
+      - name: Verify sandbox connectivity
+        env:
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+        run: |
+          cd demo-server
+          echo "PAYPAL_CLIENT_ID=$PAYPAL_CLIENT_ID" > .env
+          echo "PAYPAL_CLIENT_SECRET=$PAYPAL_CLIENT_SECRET" >> .env
+          echo "PAYPAL_API_BASE=https://api-m.sandbox.paypal.com" >> .env
+          echo "PORT=3000" >> .env
+          # Start server in background
+          node server.js &
+          sleep 3
+          # Test health endpoint
+          HTTP_STATUS=$(curl -s -o /tmp/health.json -w "%{http_code}" http://localhost:3000/health)
+          cat /tmp/health.json
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "❌ Health check failed with HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          echo "✅ Sandbox connectivity verified"
+
+  build-ios:
+    name: "iOS: Weekly compile check"
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          xcodebuild \
+            -project direct-api-app-switch/AppSwitchTest/AppSwitchTest.xcodeproj \
+            -scheme AppSwitchTest \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            build
