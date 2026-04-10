@@ -1,0 +1,18 @@
+{
+  "name": "paypal-app-switch-demo-server",
+  "version": "1.0.0",
+  "description": "Demo server for PayPal App Switch sample apps — OAuth, Orders v2, Vault v3",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

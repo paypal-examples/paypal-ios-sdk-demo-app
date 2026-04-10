@@ -1,0 +1,8 @@
+# Credentials — never commit
+Config.plist
+
+# Xcode build artifacts
+build/
+DerivedData/
+*.xcuserdata
+*.xcworkspace/xcuserdata/

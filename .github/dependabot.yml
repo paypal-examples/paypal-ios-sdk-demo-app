@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/direct-api-app-switch/android"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directory: "/demo-server"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
