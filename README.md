@@ -2,6 +2,8 @@
 
 Sample apps demonstrating PayPal payment integrations for iOS and Android. Clone, configure your sandbox credentials, and see payments working in under 90 seconds.
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/paypal-examples/paypal-ios-sdk-demo-app?quickstart=1)
+
 > **New to PayPal?** [Create a sandbox account](https://developer.paypal.com/dashboard/applications/sandbox) to get your Client ID and Secret.
 
 ---
@@ -65,6 +67,19 @@ open AppSwitchTest/AppSwitchTest.xcodeproj
 4. App captures the order and shows the Capture ID
 
 Check `http://localhost:3000/debug` to see every API request and response as copyable cURL commands.
+
+---
+
+## Running on Codespaces
+
+The demo server runs in GitHub Codespaces with zero local setup:
+
+1. Click the **Open in GitHub Codespaces** badge above
+2. Enter your sandbox **Client ID** and **Client Secret** when prompted
+3. The server starts automatically on port 3000
+4. Open the **Ports** tab to access the debug panel at `/debug`
+
+> **Note:** The mobile apps (iOS/Android) require Xcode or Android Studio locally. Codespaces runs the demo server so you can test API calls and see the debug panel without installing Node.js.
 
 ---
 
