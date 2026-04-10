@@ -31,7 +31,15 @@ class PayPalService {
 
         clientId = id
         clientSecret = secret
+
+        // On simulator, use custom URL scheme for return/cancel URLs so
+        // ASWebAuthenticationSession can intercept the redirect.
+        // On real devices, use the HTTPS domain from Config.plist.
+        #if targetEnvironment(simulator)
+        returnDomain = "appswitch-test://callback"
+        #else
         returnDomain = config["RETURN_DOMAIN"] as? String ?? "https://example.com"
+        #endif
     }
 
     private var cachedAccessToken: String?

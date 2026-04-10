@@ -95,7 +95,7 @@ class AppSwitchHandler: NSObject {
 
             let session = ASWebAuthenticationSession(
                 url: url,
-                callback: .https(returnDomain, path: "/paypal/return")
+                callback: .https(host: returnDomain, path: "/paypal/return")
             ) { [weak self] callbackURL, error in
                 if let callbackURL = callbackURL {
                     self?.handleReturn(url: callbackURL)
