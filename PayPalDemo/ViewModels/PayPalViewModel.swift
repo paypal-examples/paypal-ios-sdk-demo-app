@@ -12,9 +12,9 @@ class PayPalViewModel: ObservableObject {
         amount: Double,
         intent: Intent
     ) async throws -> String? {
-        async let config = try await DemoMerchantAPI.shared.getCoreConfig()
+        async let config = try await DemoCartAPI.shared.getCoreConfig()
 
-        let order = try await DemoMerchantAPI.shared.createOrder(
+        let order = try await DemoCartAPI.shared.createOrder(
             orderParams: CreateOrderParams(
                 applicationContext: nil,
                 intent: intent.rawValue,
@@ -39,7 +39,7 @@ class PayPalViewModel: ObservableObject {
             )
             print("✅ Order approved with orderID: \(paypalCheckoutResult.orderID) and PayerID: \(paypalCheckoutResult.payerID)")
 
-            let completedOrder = try await DemoMerchantAPI.shared.completeOrder(
+            let completedOrder = try await DemoCartAPI.shared.completeOrder(
                 orderID: order.id,
                 payPalClientMetadataID: payPalClientMetadataID,
                 intent: intent
