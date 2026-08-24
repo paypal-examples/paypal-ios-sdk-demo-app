@@ -1,5 +1,6 @@
 import Foundation
 import CorePayments
+import PayPalPayments
 
 /// API Client used to create and process orders on sample merchant server
 final class DemoMerchantAPI {
@@ -10,7 +11,9 @@ final class DemoMerchantAPI {
 
     public func getCoreConfig() async throws -> CoreConfig {
         let clientID = "AQTfw2irFfemo-eWG4H5UY-b9auKihUpXQ2Engl4G1EsHJe2mkpfUv_SN3Mba0v3CfrL6Fk_ecwv9EOo"
-        return CoreConfig(clientID: clientID, environment: DemoSettings.environment.paypalSDKEnvironment)
+        let merchantID = "TODO: get merchant id"
+        let environment = DemoSettings.environment.paypalSDKEnvironment
+        return CoreConfig(clientID: clientID, environment: environment, merchantID: merchantID)
     }
 
     /// This function replicates a way a merchant may go about creating an order on their server and is not part of the SDK flow.
@@ -43,7 +46,23 @@ final class DemoMerchantAPI {
         let data = try await data(for: urlRequest)
         return try parse(from: data)
     }
-
+    
+    func makePayPalURLConfig() throws -> PayPalURLConfig {
+        guard let successURL = makeURL(relativePath: "/success", queryParameters: ["platform": "iOS"]),
+              let cancelURL = buildBaseURL(with: "/cancel")
+        else {
+            let errorUserInfo = [NSLocalizedDescriptionKey: "PayPalURLConfig could not be constructed."]
+            throw NSError(domain: "DemoMerchantAPI", code: -1, userInfo: errorUserInfo)
+        }
+        
+        let fallbackSchemeURL = URL(string: "sdk.ios.paypal://paypal-checkout")
+        return PayPalURLConfig(
+            returnAppURL: successURL,
+            cancelAppURL: cancelURL,
+            fallbackSchemeURL: fallbackSchemeURL
+        )
+    }
+    
     // MARK: Private methods
 
     private func buildBaseURL(with endpoint: String) -> URL? {
@@ -53,7 +72,17 @@ final class DemoMerchantAPI {
     private func buildPayPalURL(with endpoint: String) -> URL? {
         URL(string: "https://api.sandbox.paypal.com" + endpoint)
     }
-
+    
+    private func makeURL(relativePath: String, queryParameters: [String: String]) -> URL? {
+        guard let url = buildBaseURL(with: relativePath) else { return nil }
+        guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            else { return nil }
+        
+        urlComponents.queryItems =
+            queryParameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+        return urlComponents.url
+    }
+    
     private func buildURLRequest<T>(method: String, url: URL, body: T?) -> URLRequest where T: Encodable {
         let encoder = JSONEncoder()
         var urlRequest = URLRequest(url: url)

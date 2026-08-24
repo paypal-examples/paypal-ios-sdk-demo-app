@@ -14,7 +14,7 @@ enum Environment: String, CaseIterable {
         }
     }
 
-    var paypalSDKEnvironment: CorePayments.Environment {
+    var paypalSDKEnvironment: CoreEnvironment {
         switch self {
         case .sandbox:
             return .sandbox
